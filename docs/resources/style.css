@@ -1,0 +1,372 @@
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #007aff; /* Scrollbar thumb color */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #005bb5; /* Darken on hover */
+}
+
+::-webkit-scrollbar-track {
+    background-color: #f0f0f0; /* Scrollbar track background */
+    border-radius: 10px;
+}
+
+body.dark-theme ::-webkit-scrollbar-thumb {
+    background-color: #007aff; /* Thumb color in dark theme */
+}
+
+body.dark-theme ::-webkit-scrollbar-track {
+    background-color: #333; /* Track color in dark theme */
+}
+
+/* Layout */
+.container {
+    display: flex;
+    height: 100vh; /* Ensure container takes full viewport height */
+    overflow: hidden; /* Prevent container itself from scrolling */
+    transition: margin-left 0.3s ease; /* Smooth transition for content */
+}
+
+/* Header */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #1e1e1e;
+    color: white;
+    height: 60px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.main-header h1 {
+    margin-left: 10px;
+    font-size: 1.5rem;
+}
+
+#theme-toggle {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* Sidebar toggle button */
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0;
+}
+
+.icon-button svg {
+    width: 24px;
+    height: 24px;
+    fill: white; /* Sidebar toggle button is always light */
+}
+
+.close-button {
+    font-size: 2rem;
+    color: white;
+    background: none;
+    border: none;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+    display: none; /* Initially hidden; only visible on smaller screens */
+}
+
+/* Folder Structure */
+.folder {
+    display: flex;
+    align-items: center;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-right: 8px;
+    padding: 0;
+}
+
+.arrow {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    fill: #fff; /* Arrows are always light */
+    transition: transform 0.3s ease;
+}
+
+.right-arrow {
+    transform: rotate(0deg);
+}
+
+.down-arrow {
+    transform: rotate(90deg);
+}
+
+/* Submenu */
+.submenu {
+    padding-left: 15px; /* Indent for subitems */
+}
+
+.hidden {
+    display: none;
+}
+
+/* Sidebar items */
+.svg-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    vertical-align: middle;
+    fill: currentColor;
+}
+
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #ccc;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.sidebar ul li a:hover {
+    background-color: #007aff;
+    color: white;
+}
+
+/* Sidebar indentation */
+.submenu a {
+    padding-left: 25px;
+}
+
+/* Hide arrow background color changes */
+.toggle-btn {
+    background-color: transparent;
+}
+
+.toggle-container a {
+    cursor: pointer;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    font-size: 14px;
+    transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
+    height: 100vh; /* Fixes sidebar height to viewport height */
+    overflow-y: auto; /* Enables scrolling for long content */
+}
+
+.sidebar.hidden {
+    transform: translateX(-100%);
+}
+
+.sidebar h2 {
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+.sidebar ul {
+    list-style-type: none;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+    display: flex; /* Ensures icon and text align horizontally */
+    align-items: center; /* Vertically align icon with text */
+    text-decoration: none;
+    color: #ccc;
+    padding: 10px 15px;
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s;
+}
+
+.sidebar ul li a:hover {
+    background-color: #007aff;
+    color: white; /* Background highlighted on hover */
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.breadcrumbs a {
+    text-decoration: none;
+    color: #007aff;
+}
+
+/* Main content */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    background-color: #f8f8f8;
+    color: #000;
+    overflow-y: auto; /* Enable independent scrolling for main content */
+    height: 100vh; /* Make sure main content also takes full height */
+    transition: all 0.3s ease; /* Smooth transition when sidebar is toggled */
+    max-width: 100%; /* Expand to full width */
+    margin: 0 auto; /* Center content */
+}
+
+.main-content.full-width {
+    max-width: 100%; /* Ensure full width when sidebar is hidden */
+}
+
+.main-content h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.main-content h2 {
+    font-size: 18px;
+    margin-top: 20px;
+    color: #007aff;
+}
+
+.main-content p {
+    margin: 10px 0;
+}
+
+.tags span {
+    background-color: #333;
+    color: white;
+    padding: 3px 8px;
+    margin-right: 5px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+pre {
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 20px 0;
+}
+
+/* Lists */
+.mentioned, .related {
+    margin: 10px 0;
+}
+
+.mentioned li, .related li {
+    list-style: none;
+    margin-bottom: 5px;
+}
+
+.mentioned li a, .related li a {
+    color: #007aff;
+    text-decoration: none;
+}
+
+.mentioned li a:hover, .related li a:hover {
+    text-decoration: underline;
+}
+
+/* Dark theme */
+body.dark-theme {
+    background-color: #1e1e1e;
+    color: #e0e0e0; /* Lighten text color */
+}
+
+body.dark-theme .main-content {
+    background-color: #252526;
+    color: #e0e0e0; /* Lighten text color */
+}
+
+body.dark-theme .tags span {
+    background-color: #007aff;
+}
+
+body.dark-theme pre {
+    background-color: #333;
+}
+
+/* Sidebar - dark theme adjustments */
+body.dark-theme .sidebar {
+    background-color: #252526;
+}
+
+body.dark-theme .sidebar ul li a {
+    color: #bbb;
+}
+
+body.dark-theme .sidebar ul li a:hover {
+    background-color: #007aff;
+    color: white;
+}
+
+/* Theme transition */
+.dark-theme .main-header, .dark-theme button {
+    background-color: #007aff;
+    color: white;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%; /* Sidebar should take up full width on mobile */
+        z-index: 1000;
+        transform: translateX(-100%); /* Initially hidden */
+    }
+
+    .sidebar.shown {
+        transform: translateX(0); /* Show the sidebar when toggled */
+    }
+
+    .close-button {
+        display: block; /* Show the close button on small screens */
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+}
+
