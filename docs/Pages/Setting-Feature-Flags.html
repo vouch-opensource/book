@@ -368,15 +368,24 @@
 
             <section class="content">
               <h1>Setting up the feature flags through a Clojure REPL</h1><p>This process is done through a Clojure script connected to the server that has a REPL running in a specific port. We usually use <a href='https://github.com/gjbae1212/gossm'>gossm</a> to forward the 9877 port with the command</p><pre><code>gossm fwd --local 9877 --remote 9877
-</code></pre><p>You can connect to this port and run Clojure code using a VSCode extension called <a href='https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.calva'>Calva</a></p><p>Using Calva extensions in vscode:</p><ul><li>Ctrl + shift + P: Calva: connect to a running repl server, not in the project</li><li>Choose the deps.edn option;</li><li>Enter localhost:9877 as the url and port in the following popup;The following code is required to setup the feature flags, you can paste the snippets in a file and run them with ALT+Enter (Evaluate top level form)</li></ul><p><img src="./Setting-Feature-Flags-images/1.png" alt="image" /></p><pre><code class="clj">&#40;comment
-  &#40;in-ns 'io.vouch.debug-repl.validators&#41;
-  ;; IMPORTANT! You need to set the initial-validators set below.
+</code></pre><p>You can connect to this port and run Clojure code using a VSCode extension called <a href='https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.calva'>Calva</a></p><p>Using Calva extensions in vscode:</p><ul><li>Ctrl + shift + P: Calva: connect to a running repl server, not in the project</li><li>Choose the deps.edn option;</li><li>Enter localhost:9877 as the url and port in the following popup;</li></ul><p><img src="./Setting-Feature-Flags-images/1.png" alt="image" /></p><p>The following code is required to setup a feature flag in the production environment, you can paste the snippets in a file and run them with ALT+Enter (Evaluate top level form) or CTRL+Enter (Evaluate selection).</p><pre><code class="clj">&#40;in-ns 'io.vouch.debug-repl.feature-flags&#41;
 
-  ;; Retrieve the validator keys using
-  &#40;clojure.pprint/pprint &#40;get-validators &#40;util/get-tendermint-url&#41; true&#41;&#41;
+&#40;require '&#91;io.vouch.debug-repl.crypto-id :as crypto-id&#93;&#41;
 
-  ;; Copy each public key and add to the initial-validators array as strings:
-  &#40;def initial-validators &#91;&#93;&#41;
+&#40;set-feature
+  &quot;FEATURE-FLAG-NAME&quot;
+  true
+  &#40;crypto-id/prod-crypto-identity-context&#41; ;; Use &#40;dev-crypto-identity-context&#41; instead for DEV or STG environments.
+  nil&#41; ;; Aditional options.
+</code></pre><p>In calva you’ll see the return of each line execution beside it with a “=>” sign like in the following example.<pre><code class="clj">&#40;set-feature &quot;FEATURE-FLAG-NAME&quot; true &#40;crypto-id/prod-crypto-identity-context&#41;&#41; =&gt; &quot;Feature FEATURE-FLAG-NAME toggled to: true&quot;
+</code></pre></p><h2>Example, the basic-validator-node-changes flag</h2><pre><code class="clj">&#40;in-ns 'io.vouch.debug-repl.validators&#41;
+;; IMPORTANT! You need to set the initial-validators set below.
+
+;; Retrieve the validator keys using
+&#40;clojure.pprint/pprint &#40;get-validators &#40;util/get-tendermint-url&#41; true&#41;&#41;
+
+;; Copy each public key and add to the initial-validators array as strings:
+&#40;def initial-validators &#91;&#93;&#41;
 </code></pre><pre><code class="clj">  ;; It should look like:
 ;; &#40;def initial-validators
 ;;     &#91;“22CCC542981B5C6637815543B47CDC3D06E05A58E77D07F119423E191AD62CCf”
@@ -384,37 +393,28 @@
 ;;      “22CCC542981B5C6637815543B47CDC3D06E05A58E77D07F119423E191AD62CCf”
 ;;      “22CCC542981B5C6637815543B47CDC3D06E05A58E77D07F119423E191AD62CCf”&#93;&#41;
 
-  &#40;feature-flags/set-feature
-   &quot;basic-validator-node-changes&quot;
-   true
-   &#40;crypto-id/prod-crypto-identity-context&#41;
-   {:io.vouch.digital-key.abci.governance.validators/validators initial-validators}&#41;
+&#40;feature-flags/set-feature
+ &quot;basic-validator-node-changes&quot;
+ true
+ &#40;crypto-id/prod-crypto-identity-context&#41;
+ {:io.vouch.digital-key.abci.governance.validators/validators initial-validators}&#41;
+</code></pre><h2>Example, the tendermint-drop-history-flag</h2><pre><code class="clj">  &#40;in-ns 'io.vouch.debug-repl.feature-flags&#41;
 
-  &#40;in-ns 'io.vouch.debug-repl.feature-flags&#41;
-
-  &#40;set-feature &quot;tendermint-drop-history-flag&quot; true &#40;crypto-id/prod-crypto-identity-context&#41; {:retention-period &quot;P14D&quot;}&#41;
-
-
-  &#40;def feature-flags &#91;&quot;fix-abci-error-wrapper&quot;
-  &quot;asset-access-auth-doc-offline-device-flag&quot;
-  &quot;find-asset-device-by-asset-query-fix&quot;
-  &quot;preserve-smt-root&quot;
-  &quot;rpc-enroll-asset-device-replace-existing-asset-device&quot;
-  &quot;service-api-asset-device-auth-doc-creation&quot;
-  &quot;suspend-and-reactivate-friends-for-rental&quot;
-  &quot;validate-membership-enroll-and-endorse-key-device-guard&quot;
-  &quot;disable-smt-storage&quot;&#93;&#41;
-
+  &#40;set-feature &quot;tendermint-drop-history-flag&quot; true &#40;dev-crypto-identity-context&#41; {:retention-period &quot;P14D&quot;}&#41;
+</code></pre><h2>Example, setting multiple feature flags</h2><pre><code class="clj">  &#40;def feature-flags
+   &#91;&quot;fix-abci-error-wrapper&quot;
+    &quot;asset-access-auth-doc-offline-device-flag&quot;
+    &quot;find-asset-device-by-asset-query-fix&quot;
+    &quot;preserve-smt-root&quot;
+    &quot;rpc-enroll-asset-device-replace-existing-asset-device&quot;
+    &quot;service-api-asset-device-auth-doc-creation&quot;
+    &quot;suspend-and-reactivate-friends-for-rental&quot;
+    &quot;validate-membership-enroll-and-endorse-key-device-guard&quot;
+    &quot;disable-smt-storage&quot;&#93;&#41;
 
   &#40;doseq &#91;feature feature-flags&#93;
     &#40;set-feature feature true &#40;crypto-id/prod-crypto-identity-context&#41; nil&#41;&#41;
-&#41;
-</code></pre><p>In calva you’ll see the return of each line execution beside it with a “=>” sign like in the following example.<pre><code class="clj">&#40;comment
-
- &#40;set-feature &quot;tendermint-drop-history-flag&quot; true &#40;crypto-id/prod-crypto-identity-context&#41; {:retention-period &quot;P14D&quot;}&#41; =&gt; &quot;Feature tendermint-drop-history-flag toggled to: true&quot;
-
-&#41;
-</code></pre></p>
+</code></pre>
             </section>
         </main>
     </div>
